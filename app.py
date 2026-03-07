@@ -149,17 +149,24 @@ def main():
         return
 
     # Sidebar
-    st.sidebar.header("FDA Deficiencies")
-    st.sidebar.markdown("클릭하면 분석 시작")
+    st.sidebar.header("FDA Deficiencies (21개)")
 
-    # Quick deficiency buttons
+    # Group deficiencies by category
+    categories = {
+        "Device Description": {k: v for k, v in FDA_DEFICIENCIES.items() if k.startswith("DD")},
+        "Labeling": {k: v for k, v in FDA_DEFICIENCIES.items() if k.startswith("LB")},
+        "Software/Cybersecurity": {k: v for k, v in FDA_DEFICIENCIES.items() if k.startswith("SC")},
+        "Performance Testing": {k: v for k, v in FDA_DEFICIENCIES.items() if k.startswith("PT")},
+        "Minor": {k: v for k, v in FDA_DEFICIENCIES.items() if k.startswith("MN")},
+    }
+
     selected_deficiency = None
-    cols = st.sidebar.columns(2)
 
-    for i, (def_id, def_name) in enumerate(FDA_DEFICIENCIES.items()):
-        col = cols[i % 2]
-        if col.button(f"{def_id}", key=def_id, help=def_name):
-            selected_deficiency = def_id
+    for cat_name, deficiencies in categories.items():
+        with st.sidebar.expander(f"📋 {cat_name} ({len(deficiencies)})", expanded=False):
+            for def_id, def_name in deficiencies.items():
+                if st.button(f"**{def_id}**: {def_name}", key=def_id, use_container_width=True):
+                    selected_deficiency = def_id
 
     st.sidebar.markdown("---")
     st.sidebar.markdown("### 빠른 검색")
